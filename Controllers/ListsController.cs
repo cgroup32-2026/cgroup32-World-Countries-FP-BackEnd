@@ -33,7 +33,7 @@ namespace CountriesProject.Controllers
         private int GetCurrentUserId() => int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
 
         [HttpGet("me")]
-        public IActionResult GetMyList([FromQuery] string listType = null)
+        public IActionResult GetMyList([FromQuery] string? listType = null)
         {
             try { return Ok(_listsBL.GetList(GetCurrentUserId(), listType)); }
             catch (Exception ex) { return BadRequest(new { message = ex.Message }); }

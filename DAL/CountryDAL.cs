@@ -37,9 +37,29 @@ namespace CountriesProject.DAL
                 con.Open();
                 SqlDataReader reader = cmd.ExecuteReader();
                 if (reader.Read())
-                    country = MapReaderToCountry(reader);
+                {
+                    country = new Country
+                    {
+                        CountryId = (int)reader["CountryId"],
+                        CcaCode3 = reader["CcaCode3"].ToString(),
+                        NameCommon = reader["NameCommon"].ToString(),
+                        NameOfficial = reader["NameOfficial"] as string,
+                        Region = reader["Region"] as string,
+                        Subregion = reader["Subregion"] as string,
+                        Capital = reader["Capital"] as string,
+                        Population = reader["Population"] as long?,
+                        AreaKm2 = reader["AreaKm2"] as double?,
+                        FlagUrl = reader["FlagUrl"] as string,
+                        MapUrl = reader["MapUrl"] as string,
+                        Latitude = reader["Latitude"] as double?,
+                        Longitude = reader["Longitude"] as double?,
+                        CurrencyCodes = ParseCsv(reader["CurrencyCodes"]),
+                        LanguageCodes = ParseCsv(reader["LanguageCodes"])
+                    };
+                }
             }
             return country;
+
         }
 
         public Country GetByCcaCode3(string ccaCode3)

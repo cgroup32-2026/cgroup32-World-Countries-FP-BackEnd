@@ -15,5 +15,7 @@
         public string MapUrl { get; set; }
         public double? Latitude { get; set; }
         public double? Longitude { get; set; }
+        public List<string> CurrencyCodes { get; set; }
+        public List<string> LanguageCodes { get; set; }
     }
 }
