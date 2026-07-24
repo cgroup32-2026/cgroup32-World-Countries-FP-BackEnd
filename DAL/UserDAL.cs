@@ -105,6 +105,20 @@ namespace CountriesProject.DAL
             }
         }
 
+
+        public void UpdatePassword(int userId, string newPasswordHash)
+        {
+            using (SqlConnection con = new SqlConnection(_connectionString))
+            {
+                SqlCommand cmd = new SqlCommand("sp_Users_FP_RM_UpdatePassword", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@UserId", userId);
+                cmd.Parameters.AddWithValue("@NewPasswordHash", newPasswordHash);
+                con.Open();
+                cmd.ExecuteNonQuery();
+            }
+        }
+
         public int UpdateLastLogin(int userId)
         {
             using (SqlConnection con = new SqlConnection(_connectionString))

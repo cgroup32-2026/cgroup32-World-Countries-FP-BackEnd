@@ -10,14 +10,15 @@ namespace CountriesProject.BL
         private static readonly Regex EmailRegex = new Regex(@"^[^@\s]+@[^@\s]+\.[^@\s]+$", RegexOptions.Compiled);
         private static readonly Regex UsernameRegex = new Regex(@"^[a-zA-Z0-9_]{3,20}$", RegexOptions.Compiled);
         private static readonly Regex PasswordRegex = new Regex(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$", RegexOptions.Compiled);
+        private readonly LoginHistoryDAL _loginHistoryDAL;
+
 
         private readonly UserDAL _userDAL;
         private readonly JwtService _jwtService;
 
-        public AuthBL(UserDAL userDAL, JwtService jwtService)
+        public AuthBL(UserDAL userDAL, JwtService jwtService, LoginHistoryDAL loginHistoryDAL)
         {
-            _userDAL = userDAL;
-            _jwtService = jwtService;
+            _userDAL = userDAL; _jwtService = jwtService; _loginHistoryDAL = loginHistoryDAL;
         }
 
         public AuthResult Register(string username, string email, string password, string fullName)
@@ -51,6 +52,7 @@ namespace CountriesProject.BL
             if (!BCrypt.Net.BCrypt.Verify(password, user.PasswordHash)) throw new Exception("Invalid username or password");
 
             _userDAL.UpdateLastLogin(user.UserId);
+            _loginHistoryDAL.RecordLogin(user.UserId);
             string token = _jwtService.GenerateToken(user);
             user.PasswordHash = null;
 
@@ -71,6 +73,19 @@ namespace CountriesProject.BL
 
             _userDAL.UpdateProfile(userId, email, fullName);
             return GetById(userId);
+        }
+
+        public void ChangePassword(int userId, string currentPassword, string newPassword)
+        {
+            User user = _userDAL.GetById(userId);
+            if (user == null) throw new Exception("user not found");
+            if (!BCrypt.Net.BCrypt.Verify(currentPassword, user.PasswordHash))
+                throw new Exception("current password is incorrect");
+            if (string.IsNullOrWhiteSpace(newPassword) || !PasswordRegex.IsMatch(newPassword))
+                throw new Exception("new password must be at least 8 characters, with an uppercase letter, a lowercase letter, and a digit");
+
+            string newHash = BCrypt.Net.BCrypt.HashPassword(newPassword);
+            _userDAL.UpdatePassword(userId, newHash);
         }
     }
 }

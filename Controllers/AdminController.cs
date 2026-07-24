@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using CountriesProject.BL;
+using System.Security.Claims;
 
 namespace CountriesProject.Controllers
 {
@@ -25,9 +26,15 @@ namespace CountriesProject.Controllers
         [HttpPut("users/{userId}/lock")]
         public IActionResult SetLocked(int userId, SetLockedRequest request)
         {
-            _adminBL.SetUserLocked(userId, request.IsLocked);
-            return Ok();
+            try
+            {
+                int requestingAdminId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+                _adminBL.SetUserLocked(userId, request.IsLocked, requestingAdminId);
+                return Ok();
+            }
+            catch (Exception ex) { return BadRequest(new { message = ex.Message }); }
         }
+
 
         [HttpPut("users/{userId}/sharing")]
         public IActionResult SetCanShare(int userId, SetCanShareRequest request)
@@ -38,5 +45,9 @@ namespace CountriesProject.Controllers
 
         [HttpGet("stats")]
         public IActionResult GetStats() => Ok(_adminBL.GetUsageStats());
+
+
+        [HttpGet("login-history")]
+        public IActionResult GetLoginHistory([FromQuery] DateTime? date) => Ok(_adminBL.GetLoginHistory(date));
     }
 }

@@ -36,6 +36,12 @@ namespace CountriesProject.Controllers
             public string FullName { get; set; }
         }
 
+        public class ChangePasswordRequest
+        {
+            public string CurrentPassword { get; set; }
+            public string NewPassword { get; set; }
+        }
+
 
         [HttpPost("register")]
         public IActionResult Register(RegisterRequest request)
@@ -50,6 +56,20 @@ namespace CountriesProject.Controllers
             try { return Ok(_authBL.Login(request.Username, request.Password)); }
             catch (Exception ex) { return BadRequest(new { message = ex.Message }); }
         }
+
+        [Authorize]
+        [HttpPut("me/password")]
+        public IActionResult ChangePassword(ChangePasswordRequest request)
+        {
+            try
+            {
+                int userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+                _authBL.ChangePassword(userId, request.CurrentPassword, request.NewPassword);
+                return Ok();
+            }
+            catch (Exception ex) { return BadRequest(new { message = ex.Message }); }
+        }
+
 
         // this is the ptrotected endpoint,  for the JWT pipeline 
         [Authorize]

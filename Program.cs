@@ -5,7 +5,9 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new CountriesProject.BL.Services.UtcDateTimeConverter()));
+
 builder.Services.AddScoped<CountriesProject.DAL.UserDAL>();
 builder.Services.AddScoped<CountriesProject.DAL.CountryDAL>();
 builder.Services.AddScoped<CountriesProject.BL.AuthBL>();
@@ -22,6 +24,7 @@ builder.Services.AddScoped<CountriesProject.DAL.QuizDAL>();
 builder.Services.AddScoped<CountriesProject.BL.QuizBL>();
 builder.Services.AddScoped<CountriesProject.DAL.AdminDAL>();
 builder.Services.AddScoped<CountriesProject.BL.AdminBL>();
+builder.Services.AddScoped<CountriesProject.DAL.LoginHistoryDAL>();
 
 builder.Services.AddHttpClient<CountriesProject.BL.Services.RestCountriesService>(client =>
 {
