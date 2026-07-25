@@ -31,6 +31,11 @@ builder.Services.AddHttpClient<CountriesProject.BL.Services.RestCountriesService
     client.BaseAddress = new Uri("https://countries.dev/");
 }); builder.Services.AddScoped<CountriesProject.BL.CountryBL>();
 
+builder.Services.AddHttpClient<CountriesProject.BL.Services.LandmarksService>(client =>
+{
+    client.BaseAddress = new Uri("https://en.wikipedia.org/");
+    client.DefaultRequestHeaders.Add("User-Agent", "CountriesProject-SchoolProject/1.0");
+});
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

@@ -29,6 +29,6 @@ namespace CountriesProject.BL
 
         public AdminUsageStats GetUsageStats() => _adminDAL.GetUsageStats();
 
-        public List<LoginHistoryEntry> GetLoginHistory(DateTime? date) => _loginHistoryDAL.GetForDate(date);
+        public List<LoginHistoryEntry> GetLoginHistory(DateTime fromUtc, DateTime toUtc) => _loginHistoryDAL.GetForRange(fromUtc, toUtc);
     }
 }

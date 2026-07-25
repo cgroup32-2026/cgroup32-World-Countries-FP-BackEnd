@@ -26,6 +26,13 @@ namespace CountriesProject.Controllers
             return country == null ? NotFound() : Ok(country);
         }
 
+        [HttpGet("{id}/landmarks")]
+        public async Task<IActionResult> GetLandmarks(int id)
+        {
+            try { return Ok(await _countryBL.GetLandmarks(id)); }
+            catch (Exception ex) { return NotFound(new { message = ex.Message }); }
+        }
+
         [Authorize(Roles = "Admin")]
         [HttpPost]
         public IActionResult Create(Country country)

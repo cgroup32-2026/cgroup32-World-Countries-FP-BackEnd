@@ -48,6 +48,6 @@ namespace CountriesProject.Controllers
 
 
         [HttpGet("login-history")]
-        public IActionResult GetLoginHistory([FromQuery] DateTime? date) => Ok(_adminBL.GetLoginHistory(date));
+        public IActionResult GetLoginHistory([FromQuery] DateTime from, [FromQuery] DateTime to) => Ok(_adminBL.GetLoginHistory(from, to));
     }
 }

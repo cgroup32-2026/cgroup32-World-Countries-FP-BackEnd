@@ -20,14 +20,15 @@ namespace CountriesProject.DAL
             }
         }
 
-        public List<LoginHistoryEntry> GetForDate(DateTime? date)
+        public List<LoginHistoryEntry> GetForRange(DateTime fromUtc, DateTime toUtc)
         {
             List<LoginHistoryEntry> list = new List<LoginHistoryEntry>();
             using (SqlConnection con = new SqlConnection(_connectionString))
             {
-                SqlCommand cmd = new SqlCommand("sp_LoginHistory_FP_RM_GetForDate", con);
+                SqlCommand cmd = new SqlCommand("sp_LoginHistory_FP_RM_GetForRange", con);
                 cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@Date", (object)date ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@FromUtc", fromUtc);
+                cmd.Parameters.AddWithValue("@ToUtc", toUtc);
                 con.Open();
                 SqlDataReader reader = cmd.ExecuteReader();
                 while (reader.Read())

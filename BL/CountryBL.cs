@@ -13,16 +13,19 @@ namespace CountriesProject.BL
         private readonly CurrencyDAL _currencyDAL;
         private readonly LanguageDAL _languageDAL;
         private readonly RestCountriesService _restCountriesService;
+        private readonly LandmarksService _landmarksService;
 
         private static readonly Regex CcaCode3Regex = new Regex(@"^[A-Za-z]{3}$", RegexOptions.Compiled);
 
 
-        public CountryBL(CountryDAL countryDAL, CurrencyDAL currencyDAL, LanguageDAL languageDAL, RestCountriesService restCountriesService)
+        public CountryBL(CountryDAL countryDAL, CurrencyDAL currencyDAL, LanguageDAL languageDAL, 
+            RestCountriesService restCountriesService, LandmarksService landmarksService)
         {
             _countryDAL = countryDAL;
             _currencyDAL = currencyDAL;
             _languageDAL = languageDAL;
             _restCountriesService = restCountriesService;
+            _landmarksService = landmarksService;
         }
 
         public List<Country> GetAll() => _countryDAL.GetAll();
@@ -150,6 +153,14 @@ namespace CountriesProject.BL
             };
 
             return results.ToList();
+        }
+
+        public async Task<List<LandmarkResult>> GetLandmarks(int countryId)
+        {
+            Country country = _countryDAL.GetById(countryId);
+            if (country == null) throw new Exception("Country not found");
+            if (country.Latitude == null || country.Longitude == null) return new List<LandmarkResult>();
+            return await _landmarksService.GetLandmarksNear(country.Latitude.Value, country.Longitude.Value);
         }
     }
 }
