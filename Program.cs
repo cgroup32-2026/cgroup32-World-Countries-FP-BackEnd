@@ -25,6 +25,8 @@ builder.Services.AddScoped<CountriesProject.BL.QuizBL>();
 builder.Services.AddScoped<CountriesProject.DAL.AdminDAL>();
 builder.Services.AddScoped<CountriesProject.BL.AdminBL>();
 builder.Services.AddScoped<CountriesProject.DAL.LoginHistoryDAL>();
+builder.Services.AddScoped<CountriesProject.DAL.GeoGameDAL>();
+builder.Services.AddScoped<CountriesProject.BL.GeoGameBL>();
 
 builder.Services.AddHttpClient<CountriesProject.BL.Services.RestCountriesService>(client =>
 {

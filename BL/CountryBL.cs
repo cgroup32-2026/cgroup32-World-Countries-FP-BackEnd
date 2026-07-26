@@ -160,7 +160,16 @@ namespace CountriesProject.BL
             Country country = _countryDAL.GetById(countryId);
             if (country == null) throw new Exception("Country not found");
             if (country.Latitude == null || country.Longitude == null) return new List<LandmarkResult>();
-            return await _landmarksService.GetLandmarksNear(country.Latitude.Value, country.Longitude.Value);
+
+            double lat = country.Latitude.Value, lng = country.Longitude.Value;
+
+            if (!string.IsNullOrWhiteSpace(country.Capital))
+            {
+                var capitalCoords = await _landmarksService.GeocodeCityName(country.Capital);
+                if (capitalCoords != null) { lat = capitalCoords.Value.lat; lng = capitalCoords.Value.lng; }
+            }
+
+            return await _landmarksService.GetLandmarksNear(lat, lng, country.NameCommon);
         }
     }
 }

@@ -31,4 +31,22 @@ namespace CountriesProject.BL.Services
         public string ImageUrl { get; set; }
         public string WikipediaUrl { get; set; }
     }
+
+    public class WikipediaCoordResponse
+    {
+        [JsonPropertyName("query")] public WikipediaCoordQuery Query { get; set; }
+    }
+    public class WikipediaCoordQuery
+    {
+        [JsonPropertyName("pages")] public Dictionary<string, WikipediaCoordPage> Pages { get; set; }
+    }
+    public class WikipediaCoordPage
+    {
+        [JsonPropertyName("coordinates")] public List<WikipediaCoord> Coordinates { get; set; }
+    }
+    public class WikipediaCoord
+    {
+        [JsonPropertyName("lat")] public double Lat { get; set; }
+        [JsonPropertyName("lon")] public double Lon { get; set; }
+    }
 }
