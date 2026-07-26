@@ -20,8 +20,10 @@ namespace CountriesProject.Controllers
         public class SetLockedRequest { public bool IsLocked { get; set; } }
         public class SetCanShareRequest { public bool CanShare { get; set; } }
 
+
         [HttpGet("users")]
         public IActionResult GetUsers() => Ok(_adminBL.GetAllUsers());
+
 
         [HttpPut("users/{userId}/lock")]
         public IActionResult SetLocked(int userId, SetLockedRequest request)
@@ -49,5 +51,12 @@ namespace CountriesProject.Controllers
 
         [HttpGet("login-history")]
         public IActionResult GetLoginHistory([FromQuery] DateTime from, [FromQuery] DateTime to) => Ok(_adminBL.GetLoginHistory(from, to));
+
+        [HttpPost("geo-landmarks/build-pool")]
+        public async Task<IActionResult> BuildLandmarkPool([FromServices] GeoGameLandmarkPoolBL poolBL)
+        {
+            int count = await poolBL.BuildPool();
+            return Ok(new { landmarksImported = count });
+        }
     }
 }

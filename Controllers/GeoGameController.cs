@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using CountriesProject.BL;
+using CountriesProject.DAL;
 
 namespace CountriesProject.Controllers
 {
@@ -49,5 +50,10 @@ namespace CountriesProject.Controllers
         [Authorize]
         [HttpGet("me/attempts")]
         public IActionResult GetMyAttempts() => Ok(_geoGameBL.GetMyAttempts(GetCurrentUserId()));
+
+
+
+        [HttpGet("landmarks")]
+        public IActionResult GetLandmarkPool([FromServices] GeoGameLandmarkDAL landmarkDAL) => Ok(landmarkDAL.GetAll());
     }
 }

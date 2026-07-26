@@ -27,20 +27,24 @@ builder.Services.AddScoped<CountriesProject.BL.AdminBL>();
 builder.Services.AddScoped<CountriesProject.DAL.LoginHistoryDAL>();
 builder.Services.AddScoped<CountriesProject.DAL.GeoGameDAL>();
 builder.Services.AddScoped<CountriesProject.BL.GeoGameBL>();
+builder.Services.AddScoped<CountriesProject.DAL.GeoGameLandmarkDAL>();
+builder.Services.AddScoped<CountriesProject.BL.GeoGameLandmarkPoolBL>();
 
 builder.Services.AddHttpClient<CountriesProject.BL.Services.RestCountriesService>(client =>
 {
     client.BaseAddress = new Uri("https://countries.dev/");
-}); builder.Services.AddScoped<CountriesProject.BL.CountryBL>();
+});
+builder.Services.AddScoped<CountriesProject.BL.CountryBL>();
 
 builder.Services.AddHttpClient<CountriesProject.BL.Services.LandmarksService>(client =>
 {
     client.BaseAddress = new Uri("https://en.wikipedia.org/");
     client.DefaultRequestHeaders.Add("User-Agent", "CountriesProject-SchoolProject/1.0");
+    // This allows Wikipedia requests up to 15 minutes before giving up
+    client.Timeout = TimeSpan.FromMinutes(15);
 });
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 
 //---------- jwt stuff
 
@@ -95,7 +99,6 @@ builder.Services.AddCors(options =>
               .AllowAnyMethod()
               .AllowAnyHeader());
 });
-
 
 var app = builder.Build();
 

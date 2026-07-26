@@ -17,6 +17,7 @@ namespace CountriesProject.BL.Services
         [JsonPropertyName("title")] public string Title { get; set; }
         [JsonPropertyName("extract")] public string Extract { get; set; }
         [JsonPropertyName("thumbnail")] public WikipediaThumbnail Thumbnail { get; set; }
+        [JsonPropertyName("coordinates")] public List<WikipediaCoord> Coordinates { get; set; }
     }
 
     public class WikipediaThumbnail
@@ -49,4 +50,6 @@ namespace CountriesProject.BL.Services
         [JsonPropertyName("lat")] public double Lat { get; set; }
         [JsonPropertyName("lon")] public double Lon { get; set; }
     }
+
+
 }
