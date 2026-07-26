@@ -55,5 +55,49 @@ namespace CountriesProject.BL
             Console.WriteLine($"Landmark pool build complete: {inserted} landmarks inserted, {failed} countries failed/skipped.");
             return inserted;
         }
+
+        public async Task<int> BuildPoolForMissingCountries()
+        {
+            var countries = _countryDAL.GetAll();
+            var alreadyCovered = _landmarkDAL.GetAll().Select(l => l.CountryId).ToHashSet();
+            var missing = countries.Where(c => !alreadyCovered.Contains(c.CountryId)).ToList();
+
+            int inserted = 0, failed = 0, consecutiveFailures = 0;
+
+            foreach (var country in missing)
+            {
+                if (country.Latitude == null || country.Longitude == null) continue;
+
+                try
+                {
+                    double lat = country.Latitude.Value, lng = country.Longitude.Value;
+                    if (!string.IsNullOrWhiteSpace(country.Capital))
+                    {
+                        await Task.Delay(1500);
+                        var capitalCoords = await _landmarksService.GeocodeCityName(country.Capital);
+                        if (capitalCoords != null) { lat = capitalCoords.Value.lat; lng = capitalCoords.Value.lng; }
+                    }
+
+                    await Task.Delay(1500);
+                    var landmarks = await _landmarksService.GetGameQualityLandmarksNear(lat, lng, country.NameCommon);
+                    foreach (var (title, imageUrl, landmarkLat, landmarkLng) in landmarks)
+                    {
+                        _landmarkDAL.Insert(country.CountryId, title, imageUrl, landmarkLat, landmarkLng);
+                        inserted++;
+                    }
+                    consecutiveFailures = 0;
+                }
+                catch (Exception)
+                {
+                    failed++;
+                    consecutiveFailures++;
+                    int backoffSeconds = Math.Min(120, 10 * (int)Math.Pow(2, consecutiveFailures - 1));
+                    await Task.Delay(TimeSpan.FromSeconds(backoffSeconds));
+                }
+            }
+
+            Console.WriteLine($"Gap-fill complete: {inserted} new landmarks, {failed} still failing.");
+            return inserted;
+        }
     }
 }

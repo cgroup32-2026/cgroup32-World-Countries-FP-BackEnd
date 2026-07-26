@@ -58,5 +58,13 @@ namespace CountriesProject.Controllers
             int count = await poolBL.BuildPool();
             return Ok(new { landmarksImported = count });
         }
+
+
+        [HttpPost("geo-landmarks/fill-gaps")]
+        public async Task<IActionResult> FillLandmarkGaps([FromServices] GeoGameLandmarkPoolBL poolBL)
+        {
+            int count = await poolBL.BuildPoolForMissingCountries();
+            return Ok(new { landmarksImported = count });
+        }
     }
 }
