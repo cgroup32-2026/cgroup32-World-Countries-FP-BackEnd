@@ -8,90 +8,8 @@ namespace CountriesProject.DAL
     {
         public ShareDAL(IConfiguration config) : base(config) { }
 
-    
-
-        public List<Share> GetAll() => RunListQuery("sp_Shares_FP_RM_GetAll", null);
-
-        public List<Share> GetByCountry(int countryId) =>
-            RunListQuery("sp_Shares_FP_RM_GetByCountry", cmd => cmd.Parameters.AddWithValue("@CountryId", countryId));
-
-        public List<Share> GetByUser(int userId) =>
-            RunListQuery("sp_Shares_FP_RM_GetByUser", cmd => cmd.Parameters.AddWithValue("@UserId", userId));
-
-        public Share GetById(int shareId)
-        {
-            Share share = null;
-            using (SqlConnection con = new SqlConnection(_connectionString))
-            {
-                SqlCommand cmd = new SqlCommand("sp_Shares_FP_RM_GetById", con);
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@ShareId", shareId);
-                con.Open();
-                SqlDataReader reader = cmd.ExecuteReader();
-                if (reader.Read()) share = MapReaderToShare(reader);
-            }
-            return share;
-        }
-
-        public int Insert(int userId, int countryId, string content, int rating)
-        {
-            using (SqlConnection con = new SqlConnection(_connectionString))
-            {
-                SqlCommand cmd = new SqlCommand("sp_Shares_FP_RM_Insert", con);
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@UserId", userId);
-                cmd.Parameters.AddWithValue("@CountryId", countryId);
-                cmd.Parameters.AddWithValue("@Content", content);
-                cmd.Parameters.AddWithValue("@Rating", rating);
-                con.Open();
-                return Convert.ToInt32(cmd.ExecuteScalar());
-            }
-        }
-
-        public void Update(int shareId, string content, int rating)
-        {
-            using (SqlConnection con = new SqlConnection(_connectionString))
-            {
-                SqlCommand cmd = new SqlCommand("sp_Shares_FP_RM_Update", con);
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@ShareId", shareId);
-                cmd.Parameters.AddWithValue("@Content", content);
-                cmd.Parameters.AddWithValue("@Rating", rating);
-                con.Open();
-                cmd.ExecuteNonQuery();
-            }
-        }
-
-        public void Delete(int shareId)
-        {
-            using (SqlConnection con = new SqlConnection(_connectionString))
-            {
-                SqlCommand cmd = new SqlCommand("sp_Shares_FP_RM_Delete", con);
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@ShareId", shareId);
-                con.Open();
-                cmd.ExecuteNonQuery();
-            }
-        }
-
-        //  private helper, the 3 "get many shares" methods above are the same
-        // only difference which params they use, so this avoids repeating the read loop 3 times.
-        private List<Share> RunListQuery(string spName, Action<SqlCommand> addParams)
-        {
-            List<Share> list = new List<Share>();
-            using (SqlConnection con = new SqlConnection(_connectionString))
-            {
-                SqlCommand cmd = new SqlCommand(spName, con);
-                cmd.CommandType = CommandType.StoredProcedure;
-                addParams?.Invoke(cmd);
-                con.Open();
-                SqlDataReader reader = cmd.ExecuteReader();
-                while (reader.Read()) list.Add(MapReaderToShare(reader));
-            }
-            return list;
-        }
-
-        private Share MapReaderToShare(SqlDataReader reader)
+        //used 5 times so i made a mapper for it
+        private Share MapToShareObject(SqlDataReader reader)
         {
             return new Share
             {
@@ -106,5 +24,187 @@ namespace CountriesProject.DAL
                 UpdatedAt = reader["UpdatedAt"] == DBNull.Value ? null : (DateTime?)reader["UpdatedAt"]
             };
         }
+
+        public List<Share> GetAll()
+        {
+            List<Share> list = new List<Share>();
+            try
+            {
+                using (SqlConnection con = GetDBSConnection())
+                {
+                    SqlCommand cmd = new SqlCommand("sp_Shares_FP_RM_GetAll", con);
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    con.Open();
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            list.Add(MapToShareObject(reader));
+                        }
+                    }
+                }
+                return list;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Was not able to fetch data from the database.", ex);
+            }
+
+        }
+
+        public List<Share> GetByCountry(int countryId)
+        {
+            List<Share> list = new List<Share>();
+            try
+            {
+                using (SqlConnection con = GetDBSConnection())
+                {
+                    SqlCommand cmd = new SqlCommand("sp_Shares_FP_RM_GetByCountry", con);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@CountryId", countryId);
+
+                    con.Open();
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            list.Add(MapToShareObject(reader));
+                        }
+                    }
+                }
+                return list;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Was not able to fetch data from the database.", ex);
+            }
+
+        }
+
+
+        public List<Share> GetByUser(int userId)
+        {
+            List<Share> list = new List<Share>();
+            try
+            {
+                using (SqlConnection con = GetDBSConnection())
+                {
+                    SqlCommand cmd = new SqlCommand("sp_Shares_FP_RM_GetByUser", con);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@UserId", userId);
+
+                    con.Open();
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            list.Add(MapToShareObject(reader));
+                        }
+                    }
+                }
+
+                return list;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Was not able to fetch data from the database.", ex);
+            }
+
+        }
+
+        public Share GetById(int shareId)
+        {
+            Share share = null;
+            try
+            {
+                using (SqlConnection con = GetDBSConnection())
+                {
+                    SqlCommand cmd = new SqlCommand("sp_Shares_FP_RM_GetById", con);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@ShareId", shareId);
+                    con.Open();
+                    SqlDataReader reader = cmd.ExecuteReader();
+                    if (reader.Read()) share = MapToShareObject(reader);
+                }
+                return share;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Was not able to fetch data from the database.", ex);
+            }
+
+        }
+
+        public int Insert(int userId, int countryId, string content, int rating)
+        {
+            try
+            {
+                using (SqlConnection con = GetDBSConnection())
+                {
+                    SqlCommand cmd = new SqlCommand("sp_Shares_FP_RM_Insert", con);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@UserId", userId);
+                    cmd.Parameters.AddWithValue("@CountryId", countryId);
+                    cmd.Parameters.AddWithValue("@Content", content);
+                    cmd.Parameters.AddWithValue("@Rating", rating);
+                    con.Open();
+                    return Convert.ToInt32(cmd.ExecuteScalar());
+                }
+            }
+
+            catch (Exception ex)
+            {
+                throw new Exception("Was not able to add data to the database.", ex);
+            }
+
+
+        }
+
+        public void Update(int shareId, string content, int rating)
+        {
+            try
+            {
+                using (SqlConnection con = GetDBSConnection())
+                {
+                    SqlCommand cmd = new SqlCommand("sp_Shares_FP_RM_Update", con);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@ShareId", shareId);
+                    cmd.Parameters.AddWithValue("@Content", content);
+                    cmd.Parameters.AddWithValue("@Rating", rating);
+                    con.Open();
+                    cmd.ExecuteNonQuery();
+                }
+            }
+
+            catch (Exception ex)
+            {
+                throw new Exception("Was not able to add data to the database.", ex);
+            }
+
+
+        }
+
+        public void Delete(int shareId)
+        {
+            try
+            {
+                using (SqlConnection con = GetDBSConnection())
+                {
+                    SqlCommand cmd = new SqlCommand("sp_Shares_FP_RM_Delete", con);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@ShareId", shareId);
+                    con.Open();
+                    cmd.ExecuteNonQuery();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Was not able to delete data from the database.", ex);
+            }
+
+        }
+
+       
     }
 }

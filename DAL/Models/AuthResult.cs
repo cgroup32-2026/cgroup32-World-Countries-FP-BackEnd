@@ -1,6 +1,4 @@
-﻿using CountriesProject.DAL.Models;
-
-namespace CountriesProject.BL
+﻿namespace CountriesProject.DAL.Models
 {
     public class AuthResult
     {

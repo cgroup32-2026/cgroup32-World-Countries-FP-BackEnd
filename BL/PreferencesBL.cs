@@ -21,14 +21,14 @@ namespace CountriesProject.BL
         public List<Continent> GetAllContinents() => _continentDAL.GetAll();
         public List<Language> GetAllLanguages() => _languageDAL.GetAll();
 
-        public List<Continent> GetUserContinents(int userId) => _preferencesDAL.GetContinentsForUser(userId);
-        public List<UserLanguagePreference> GetUserLanguages(int userId) => _preferencesDAL.GetLanguagesForUser(userId);
+        public List<Continent> GetUserContinents(int userId) => _preferencesDAL.GetContinents(userId);
+        public List<UserLanguagePreference> GetUserLanguages(int userId) => _preferencesDAL.GetLanguages(userId);
 
         public void SetUserContinents(int userId, List<int> continentIds)
         {
-            _preferencesDAL.ClearContinentsForUser(userId);
+            _preferencesDAL.ClearContinents(userId);
             foreach (int continentId in continentIds.Distinct())
-                _preferencesDAL.AddContinentForUser(userId, continentId);
+                _preferencesDAL.AddContinent(userId, continentId);
         }
 
         public void SetUserLanguages(int userId, List<(int LanguageId, string Level)> languages)
@@ -39,9 +39,9 @@ namespace CountriesProject.BL
                     throw new Exception($"Invalid level '{lang.Level}'. Must be one of: {string.Join(", ", ValidLevels)}");
             }
 
-            _preferencesDAL.ClearLanguagesForUser(userId);
+            _preferencesDAL.ClearLanguages(userId);
             foreach (var lang in languages)
-                _preferencesDAL.AddLanguageForUser(userId, lang.LanguageId, lang.Level);
+                _preferencesDAL.AddLanguage(userId, lang.LanguageId, lang.Level);
         }
     }
 }

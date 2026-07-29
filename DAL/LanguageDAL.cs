@@ -8,36 +8,49 @@ namespace CountriesProject.DAL
     {
         public LanguageDAL(IConfiguration config) : base(config) { }
 
-        public int GetOrCreate(string code, string name)
+        public int Insert(string code, string name)
         {
-            using (SqlConnection con = new SqlConnection(_connectionString))
+            try
             {
-                SqlCommand cmd = new SqlCommand("sp_Languages_FP_RM_InsertIfNotExists", con);
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@Code", code);
-                cmd.Parameters.AddWithValue("@Name", name);
-
-                con.Open();
-                SqlDataReader reader = cmd.ExecuteReader();
-                reader.Read();
-                return (int)reader["LanguageId"];
+                using (SqlConnection con = GetDBSConnection())
+                {
+                    SqlCommand cmd = new SqlCommand("sp_Languages_FP_RM_InsertIfNotExists", con);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@Code", code);
+                    cmd.Parameters.AddWithValue("@Name", name);
+                    con.Open();
+                    SqlDataReader reader = cmd.ExecuteReader();
+                    reader.Read();
+                    return (int)reader["LanguageId"];
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Was not able to add data to the database.", ex);
             }
         }
 
         public List<Language> GetAll()
         {
             List<Language> list = new List<Language>();
-            using (SqlConnection con = new SqlConnection(_connectionString))
+            try
             {
-                SqlCommand cmd = new SqlCommand("sp_Languages_FP_RM_GetAll", con);
-                cmd.CommandType = CommandType.StoredProcedure;
+                using (SqlConnection con = GetDBSConnection())
+                {
+                    SqlCommand cmd = new SqlCommand("sp_Languages_FP_RM_GetAll", con);
+                    cmd.CommandType = CommandType.StoredProcedure;
 
-                con.Open();
-                SqlDataReader reader = cmd.ExecuteReader();
-                while (reader.Read())
-                    list.Add(new Language { LanguageId = (int)reader["LanguageId"], Code = reader["Code"].ToString(), Name = reader["Name"].ToString() });
+                    con.Open();
+                    SqlDataReader reader = cmd.ExecuteReader();
+                    while (reader.Read())
+                        list.Add(new Language { LanguageId = (int)reader["LanguageId"], Code = reader["Code"].ToString(), Name = reader["Name"].ToString() });
+                }
+                return list;
             }
-            return list;
+            catch (Exception ex)
+            {
+                throw new Exception("Was not able to fetch data from the database.", ex);
+            }
         }
     }
 }

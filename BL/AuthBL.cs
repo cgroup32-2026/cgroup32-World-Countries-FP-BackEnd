@@ -10,15 +10,16 @@ namespace CountriesProject.BL
         private static readonly Regex EmailRegex = new Regex(@"^[^@\s]+@[^@\s]+\.[^@\s]+$", RegexOptions.Compiled);
         private static readonly Regex UsernameRegex = new Regex(@"^[a-zA-Z0-9_]{3,20}$", RegexOptions.Compiled);
         private static readonly Regex PasswordRegex = new Regex(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$", RegexOptions.Compiled);
+        
         private readonly LoginHistoryDAL _loginHistoryDAL;
-
-
         private readonly UserDAL _userDAL;
         private readonly JwtService _jwtService;
 
         public AuthBL(UserDAL userDAL, JwtService jwtService, LoginHistoryDAL loginHistoryDAL)
         {
-            _userDAL = userDAL; _jwtService = jwtService; _loginHistoryDAL = loginHistoryDAL;
+            _userDAL = userDAL;
+            _jwtService = jwtService;
+            _loginHistoryDAL = loginHistoryDAL;
         }
 
         public AuthResult Register(string username, string email, string password, string fullName)
@@ -33,11 +34,14 @@ namespace CountriesProject.BL
             if (_userDAL.GetByUsername(username) != null)
                 throw new Exception("Username already exists");
 
+
+            // im using encryption for the password, alongside JWT tokens.
             string passwordHash = BCrypt.Net.BCrypt.HashPassword(password);
             User newUser = new User { Username = username, Email = email, PasswordHash = passwordHash, FullName = fullName };
 
             int newId = _userDAL.Register(newUser);
             User createdUser = _userDAL.GetById(newId);
+            _loginHistoryDAL.Insert(createdUser.UserId);
             string token = _jwtService.GenerateToken(createdUser);
             createdUser.PasswordHash = null;
 
@@ -52,7 +56,7 @@ namespace CountriesProject.BL
             if (!BCrypt.Net.BCrypt.Verify(password, user.PasswordHash)) throw new Exception("Invalid username or password");
 
             _userDAL.UpdateLastLogin(user.UserId);
-            _loginHistoryDAL.RecordLogin(user.UserId);
+            _loginHistoryDAL.Insert(user.UserId);
             string token = _jwtService.GenerateToken(user);
             user.PasswordHash = null;
 

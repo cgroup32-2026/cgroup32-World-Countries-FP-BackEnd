@@ -71,7 +71,6 @@ namespace CountriesProject.Controllers
         }
 
 
-        // this is the ptrotected endpoint,  for the JWT pipeline 
         [Authorize]
         [HttpGet("me")]
         public IActionResult Me()

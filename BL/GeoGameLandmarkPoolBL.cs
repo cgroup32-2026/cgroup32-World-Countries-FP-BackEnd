@@ -4,6 +4,8 @@ using CountriesProject.BL.Services;
 
 namespace CountriesProject.BL
 {
+    //this class is mainly for building the pool using an admin button in the website. its meant to be used once only.
+    //(was already used)
     public class GeoGameLandmarkPoolBL
     {
         private readonly CountryDAL _countryDAL;

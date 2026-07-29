@@ -25,7 +25,7 @@ namespace CountriesProject.BL
         public List<UserCountryListEntry> GetList(int userId, string listType = null)
         {
             if (listType != null) ValidateListType(listType);
-            return _listDAL.GetForUser(userId, listType);
+            return _listDAL.Get(userId, listType);
         }
 
         public void AddToList(int userId, int countryId, string listType)
@@ -48,7 +48,7 @@ namespace CountriesProject.BL
             ValidateListType(fromListType);
             ValidateListType(toListType);
 
-            var currentEntries = _listDAL.GetForUser(userId, fromListType);
+            var currentEntries = _listDAL.Get(userId, fromListType);
             bool existsInSource = currentEntries.Any(e => e.CountryId == countryId);
             if (!existsInSource)
                 throw new Exception($"country is not currently in your '{fromListType}' list, nothing to move.");

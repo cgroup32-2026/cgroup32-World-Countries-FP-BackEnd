@@ -2,6 +2,7 @@
 
 namespace CountriesProject.BL.Services
 {
+    //used AI to help me here
     public class WikipediaQueryResponse
     {
         [JsonPropertyName("query")] public WikipediaQuery Query { get; set; }

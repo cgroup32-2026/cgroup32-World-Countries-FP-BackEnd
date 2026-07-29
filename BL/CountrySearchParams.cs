@@ -1,5 +1,8 @@
 ﻿namespace CountriesProject.BL
 {
+    //helper class I can use to filter countires easie instead of using  complicated stored procedures.
+    //this represents what would the user choose or type in the site. each field is also represneted
+    //by a field in the country tab in the site. 
     public class CountrySearchParams
     {
         public string? Name { get; set; }

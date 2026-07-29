@@ -17,6 +17,9 @@ namespace CountriesProject.Controllers
             _adminBL = adminBL;
         }
 
+        //tried nested classes for all the controllers, for clearer integration with backend json fetch api
+        // didnt use records or seprate dtos classes that holds them to not add more files to track
+
         public class SetLockedRequest { public bool IsLocked { get; set; } }
         public class SetCanShareRequest { public bool CanShare { get; set; } }
 

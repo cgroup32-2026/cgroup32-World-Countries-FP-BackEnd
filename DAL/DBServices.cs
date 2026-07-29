@@ -10,5 +10,10 @@ namespace CountriesProject.DAL
         {
             _connectionString = config.GetConnectionString("myProjDB");
         }
+
+        protected SqlConnection GetDBSConnection()
+        {
+            return new SqlConnection(_connectionString);
+        }
     }
 }

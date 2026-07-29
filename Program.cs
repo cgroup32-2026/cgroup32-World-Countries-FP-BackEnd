@@ -8,6 +8,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers()
     .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new CountriesProject.BL.Services.UtcDateTimeConverter()));
 
+//  I used dependency injection using the built in ASP.net Addscoped methods and registering the classes that depend on each other
+//  instead of " = new DependentClass()" 
+
 builder.Services.AddScoped<CountriesProject.DAL.UserDAL>();
 builder.Services.AddScoped<CountriesProject.DAL.CountryDAL>();
 builder.Services.AddScoped<CountriesProject.BL.AuthBL>();
@@ -40,13 +43,13 @@ builder.Services.AddHttpClient<CountriesProject.BL.Services.LandmarksService>(cl
 {
     client.BaseAddress = new Uri("https://en.wikipedia.org/");
     client.DefaultRequestHeaders.Add("User-Agent", "CountriesProject-SchoolProject/1.0");
-    // This allows Wikipedia requests up to 15 minutes before giving up
+
     client.Timeout = TimeSpan.FromMinutes(15);
 });
 
 builder.Services.AddEndpointsApiExplorer();
 
-//---------- jwt stuff
+//jwt stuff
 
 builder.Services.AddSwaggerGen(options =>
 {
@@ -102,7 +105,7 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment() || true)
 {
     app.UseSwagger();
     app.UseSwaggerUI();

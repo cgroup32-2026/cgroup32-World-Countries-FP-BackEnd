@@ -10,57 +10,82 @@ namespace CountriesProject.DAL
 
         public void DeleteAll()
         {
-            using (SqlConnection con = new SqlConnection(_connectionString))
+            try
             {
-                SqlCommand cmd = new SqlCommand("sp_GeoGameLandmarks_FP_RM_DeleteAll", con);
-                cmd.CommandType = CommandType.StoredProcedure;
-                con.Open();
-                cmd.ExecuteNonQuery();
+                using (SqlConnection con = GetDBSConnection())
+                {
+                    SqlCommand cmd = new SqlCommand("sp_GeoGameLandmarks_FP_RM_DeleteAll", con);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    con.Open();
+                    cmd.ExecuteNonQuery();
+                }
             }
+            catch (Exception ex)
+            {
+                throw new Exception("Was not able to delete data from the database.", ex);
+            }
+
         }
 
         public void Insert(int countryId, string title, string imageUrl, double lat, double lng)
         {
-            using (SqlConnection con = new SqlConnection(_connectionString))
+            try
             {
-                SqlCommand cmd = new SqlCommand("sp_GeoGameLandmarks_FP_RM_Insert", con);
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@CountryId", countryId);
-                cmd.Parameters.AddWithValue("@Title", title);
-                cmd.Parameters.AddWithValue("@ImageUrl", imageUrl);
-                cmd.Parameters.AddWithValue("@Latitude", lat);
-                cmd.Parameters.AddWithValue("@Longitude", lng);
-                con.Open();
-                cmd.ExecuteNonQuery();
+                using (SqlConnection con = GetDBSConnection())
+                {
+                    SqlCommand cmd = new SqlCommand("sp_GeoGameLandmarks_FP_RM_Insert", con);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@CountryId", countryId);
+                    cmd.Parameters.AddWithValue("@Title", title);
+                    cmd.Parameters.AddWithValue("@ImageUrl", imageUrl);
+                    cmd.Parameters.AddWithValue("@Latitude", lat);
+                    cmd.Parameters.AddWithValue("@Longitude", lng);
+                    con.Open();
+                    cmd.ExecuteNonQuery();
+                }
             }
+            catch (Exception ex)
+            {
+                throw new Exception("Was not able to add data to the database.", ex);
+            }
+
+
         }
 
         public List<GeoGameLandmark> GetAll()
         {
             List<GeoGameLandmark> list = new List<GeoGameLandmark>();
-            using (SqlConnection con = new SqlConnection(_connectionString))
+            try
             {
-                SqlCommand cmd = new SqlCommand("sp_GeoGameLandmarks_FP_RM_GetAll", con);
-                cmd.CommandType = CommandType.StoredProcedure;
-                con.Open();
-                SqlDataReader reader = cmd.ExecuteReader();
-                while (reader.Read())
+                using (SqlConnection con = GetDBSConnection())
                 {
-                    list.Add(new GeoGameLandmark
+                    SqlCommand cmd = new SqlCommand("sp_GeoGameLandmarks_FP_RM_GetAll", con);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    con.Open();
+                    SqlDataReader reader = cmd.ExecuteReader();
+                    while (reader.Read())
                     {
-                        LandmarkId = (int)reader["LandmarkId"],
-                        CountryId = (int)reader["CountryId"],
-                        CountryName = reader["CountryName"].ToString(),
-                        Region = reader["Region"] as string,
-                        Title = reader["Title"].ToString(),
-                        ImageUrl = reader["ImageUrl"].ToString(),
-                        Latitude = (double)reader["Latitude"],
-                        Longitude = (double)reader["Longitude"],
-                        AreaKm2 = reader["AreaKm2"] as double?
-                    });
+                        list.Add(new GeoGameLandmark
+                        {
+                            LandmarkId = (int)reader["LandmarkId"],
+                            CountryId = (int)reader["CountryId"],
+                            CountryName = reader["CountryName"].ToString(),
+                            Region = reader["Region"] as string,
+                            Title = reader["Title"].ToString(),
+                            ImageUrl = reader["ImageUrl"].ToString(),
+                            Latitude = (double)reader["Latitude"],
+                            Longitude = (double)reader["Longitude"],
+                            AreaKm2 = reader["AreaKm2"] as double?
+                        });
+                    }
                 }
+                return list;
             }
-            return list;
+            catch (Exception ex)
+            {
+                throw new Exception("Was not able to fetch data from the database.", ex);
+            }
+
         }
     }
 }

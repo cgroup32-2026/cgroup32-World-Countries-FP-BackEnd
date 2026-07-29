@@ -29,7 +29,6 @@ namespace CountriesProject.BL
         }
 
         public List<Country> GetAll() => _countryDAL.GetAll();
-
         public Country GetById(int id) => _countryDAL.GetById(id);
 
 
@@ -93,14 +92,14 @@ namespace CountriesProject.BL
                 foreach (var currency in result.Currencies)
                 {
                     if (string.IsNullOrEmpty(currency.Code)) continue;
-                    _currencyDAL.InsertIfNotExists(currency.Code, currency.Name, currency.Symbol);
+                    _currencyDAL.Insert(currency.Code, currency.Name, currency.Symbol);
                     _countryDAL.AddCurrencyLink(countryId, currency.Code);
                 }
 
                 foreach (var language in result.Languages)
                 {
                     if (string.IsNullOrEmpty(language.Iso6391)) continue;
-                    int languageId = _languageDAL.GetOrCreate(language.Iso6391, language.Name);
+                    int languageId = _languageDAL.Insert(language.Iso6391, language.Name);
                     _countryDAL.AddLanguageLink(countryId, languageId);
                 }
             }
@@ -114,9 +113,9 @@ namespace CountriesProject.BL
         }
 
 
-        public List<CountryWithDetails> Search(CountrySearchParams p)
+        public List<Country> Search(CountrySearchParams p)
         {
-            IEnumerable<CountryWithDetails> results = _countryDAL.GetAllWithDetails();
+            IEnumerable<Country> results = _countryDAL.GetAllWithDetails();
 
             if (!string.IsNullOrWhiteSpace(p.Name))
                 results = results.Where(c => c.NameCommon != null &&

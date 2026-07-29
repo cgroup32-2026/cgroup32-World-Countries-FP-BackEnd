@@ -12,14 +12,14 @@ namespace CountriesProject.BL
             _quizDAL = quizDAL;
         }
 
-        public List<Quiz> GetAllQuizzes() => _quizDAL.GetAllQuizzes();
+        public List<Quiz> GetAllQuizzes() => _quizDAL.GetAll();
 
         public QuizForPlayer GetQuizForPlayer(int quizId)
         {
-            Quiz quiz = _quizDAL.GetQuizById(quizId);
+            Quiz quiz = _quizDAL.GetById(quizId);
             if (quiz == null) throw new Exception("Quiz not found");
 
-            List<QuizQuestion> questions = _quizDAL.GetQuestionsForQuiz(quizId);
+            List<QuizQuestion> questions = _quizDAL.GetAllQuestions(quizId);
 
             return new QuizForPlayer
             {
@@ -41,13 +41,13 @@ namespace CountriesProject.BL
 
         public QuizSubmissionResult SubmitAttempt(int userId, int quizId, List<AnswerInput> answers, int timeTakenSeconds)
         {
-            Quiz quiz = _quizDAL.GetQuizById(quizId);
+            Quiz quiz = _quizDAL.GetById(quizId);
             if (quiz == null) throw new Exception("Quiz not found");
 
             if (timeTakenSeconds > quiz.TimeLimitSeconds)
                 throw new Exception("Time limit exceeded for this quiz");
 
-            List<QuizQuestion> questions = _quizDAL.GetQuestionsForQuiz(quizId);
+            List<QuizQuestion> questions = _quizDAL.GetAllQuestions(quizId);
             int score = 0;
             List<QuestionResult> results = new List<QuestionResult>();
 
@@ -67,7 +67,7 @@ namespace CountriesProject.BL
                 });
             }
 
-            _quizDAL.InsertAttempt(userId, quizId, score, timeTakenSeconds);
+            _quizDAL.InsertQuizAttempt(userId, quizId, score, timeTakenSeconds);
 
             return new QuizSubmissionResult
             {
@@ -78,7 +78,7 @@ namespace CountriesProject.BL
             };
         }
 
-        public List<QuizAttempt> GetMyAttempts(int userId) => _quizDAL.GetAttemptsForUser(userId);
+        public List<QuizAttempt> GetMyAttempts(int userId) => _quizDAL.GetAllAttempts(userId);
 
         public List<LeaderboardEntry> GetLeaderboard(int quizId, int top = 10) => _quizDAL.GetLeaderboard(quizId, top);
     }

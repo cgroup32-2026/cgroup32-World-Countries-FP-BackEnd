@@ -11,26 +11,36 @@ namespace CountriesProject.DAL
         public AdminUsageStats GetUsageStats()
         {
             AdminUsageStats stats = null;
-            using (SqlConnection con = new SqlConnection(_connectionString))
+            try
             {
-                SqlCommand cmd = new SqlCommand("sp_Admin_FP_RM_GetUsageStats", con);
-                cmd.CommandType = CommandType.StoredProcedure;
-                con.Open();
-                SqlDataReader reader = cmd.ExecuteReader();
-                if (reader.Read())
+                using (SqlConnection con = GetDBSConnection())
                 {
-                    stats = new AdminUsageStats
+                    SqlCommand cmd = new SqlCommand("sp_Admin_FP_RM_GetUsageStats", con);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    con.Open();
+                    using (SqlDataReader reader = cmd.ExecuteReader())
                     {
-                        TotalUsers = (int)reader["TotalUsers"],
-                        LoginsToday = (int)reader["LoginsToday"],
-                        TotalCountriesImported = (int)reader["TotalCountriesImported"],
-                        TotalSavedCountries = (int)reader["TotalSavedCountries"],
-                        TotalShares = (int)reader["TotalShares"],
-                        TotalQuizAttempts = (int)reader["TotalQuizAttempts"]
-                    };
+                        if (reader.Read())
+
+                            stats = new AdminUsageStats
+                            {
+                                TotalUsers = (int)reader["TotalUsers"],
+                                LoginsToday = (int)reader["LoginsToday"],
+                                TotalCountriesImported = (int)reader["TotalCountriesImported"],
+                                TotalSavedCountries = (int)reader["TotalSavedCountries"],
+                                TotalShares = (int)reader["TotalShares"],
+                                TotalQuizAttempts = (int)reader["TotalQuizAttempts"]
+                            };
+                    }      
                 }
+                return stats;
             }
-            return stats;
+            catch (Exception ex)
+            {
+
+                throw new Exception("Was not able to fetch data from the database.", ex);
+            }
+
         }
     }
 }
