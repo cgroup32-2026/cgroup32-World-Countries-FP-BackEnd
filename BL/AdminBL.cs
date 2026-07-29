@@ -22,7 +22,7 @@ namespace CountriesProject.BL
         public void SetUserLocked(int targetUserId, bool isLocked, int requestingAdminId)
         {
             if (isLocked && targetUserId == requestingAdminId)
-                throw new Exception("you cannot lock your own account");
+                throw new Exception("you cannot lock your own account ");
             _userDAL.SetLocked(targetUserId, isLocked);
         }
         public void SetUserCanShare(int userId, bool canShare) => _userDAL.SetCanShare(userId, canShare);
